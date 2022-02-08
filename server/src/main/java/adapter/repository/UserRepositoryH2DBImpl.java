@@ -19,41 +19,36 @@ public class UserRepositoryH2DBImpl implements UserRepository {
     private int nextAvailableId;
 
     public UserRepositoryH2DBImpl() {
-//        dropTableIfExist("USERS");
-//        dropTableIfExist("CARDS");
-//        dropTableIfExist("SCORES");
+        dropTableIfExist("USERS");
         createTableUsers();
         nextAvailableId = getNextId();
-//        createTableCards();
 
     }
 
     @Override
     public Optional<User> create(User user) {
         Optional<User> toReturn = Optional.empty();
-        if (isUserExist(user.getLogin(), user.getPassword())) {
+        if (isUserExist(user.getCardNumber(), user.getPinCode())) {
             return toReturn;
         }
 
-        String sql = "INSERT INTO USERS VALUES(?,?,?);";
+        String sql = "INSERT INTO USERS VALUES(?,?,?,?,?);";
         int rows = 0;
         try (Connection connection = getConnection().orElseThrow(SQLException::new)) {
             connection.setAutoCommit(false);
             try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
                 preparedStatement.setInt(1, nextAvailableId);
-                preparedStatement.setString(2, user.getLogin());
-                preparedStatement.setString(3, user.getPassword());
+                preparedStatement.setString(2, user.getCardNumber());
+                preparedStatement.setString(3, user.getPinCode());
+                preparedStatement.setString(4, user.getFirstName());
+                preparedStatement.setString(5, user.getLastName());
 
                 rows = preparedStatement.executeUpdate();
 
                 connection.commit();
 
-                if (rows > 0){
-                    User userInDB = new User();
-                    userInDB.setId(nextAvailableId);
-                    userInDB.setLogin(user.getLogin());
-                    userInDB.setPassword(user.getPassword());
-                    toReturn = Optional.of(userInDB);
+                if (rows > 0) {
+                    toReturn = Optional.of(user);
                     nextAvailableId++;
                 }
             } catch (SQLException e) {
@@ -66,18 +61,22 @@ public class UserRepositoryH2DBImpl implements UserRepository {
         return toReturn;
     }
 
-    public Optional<User> findUser(String login,String password){
+    @Override
+    public Optional<User> findUser(String login, String password) {
         User user = null;
-        String sql = "SELECT id, login, password " +
+        String sql = "SELECT id, login, password,first_name, last_name " +
                 "FROM USERS WHERE login = '" + login + "' AND password = '" + password + "' LIMIT 1";
         try (Connection connection = getConnection().orElseThrow(SQLException::new)) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
                     while (resultSet.next()) {
-                        user = new User();
-                        user.setId(resultSet.getInt("id"));
-                        user.setLogin(resultSet.getString("login"));
-                        user.setPassword(resultSet.getString("password"));
+                        user = User.builder()
+                                .id(resultSet.getInt("id"))
+                                .cardNumber(resultSet.getString("login"))
+                                .pinCode(resultSet.getString("password"))
+                                .firstName(resultSet.getString("first_name"))
+                                .lastName(resultSet.getString("last_name"))
+                                .build();
                     }
                 }
             }
@@ -89,22 +88,25 @@ public class UserRepositoryH2DBImpl implements UserRepository {
 
     @Override
     public boolean isUserExist(String login, String password) {
-        return findUser(login,password).isPresent();
+        return findUser(login, password).isPresent();
     }
 
     @Override
-    public List<User> getAllUsers(){
+    public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
-        String sql = "SELECT id,login,password FROM USERS;";
+        String sql = "SELECT id,login,password,first_name, last_name FROM USERS;";
 
         try (Connection connection = getConnection().orElseThrow(SQLException::new)) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
                     while (resultSet.next()) {
-                        User user = new User();
-                        user.setId(resultSet.getInt("id"));
-                        user.setLogin(resultSet.getString("login"));
-                        user.setPassword(resultSet.getString("password"));
+                        User user = User.builder()
+                                .id(resultSet.getInt("id"))
+                                .cardNumber(resultSet.getString("login"))
+                                .pinCode(resultSet.getString("password"))
+                                .firstName(resultSet.getString("first_name"))
+                                .lastName(resultSet.getString("last_name"))
+                                .build();
 
                         users.add(user);
                     }
@@ -115,6 +117,31 @@ public class UserRepositoryH2DBImpl implements UserRepository {
         }
 
         return users;
+    }
+
+    @Override
+    public boolean removeUser(String login, String password) {
+        if (!isUserExist(login, password)) {
+            return false;
+        }
+
+        int rows = 0;
+        String sql = "DELETE FROM USERS WHERE login = '" + login + "' AND password = '" + password + "'";
+
+        try (Connection connection = getConnection().orElseThrow(SQLException::new)) {
+            connection.setAutoCommit(false);
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+                rows = preparedStatement.executeUpdate();
+                connection.commit();
+            }
+            catch (SQLException e) {
+                connection.rollback();
+                e.printStackTrace();
+            }
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+        return rows > 0;
     }
 
     // organizational methods
@@ -148,6 +175,8 @@ public class UserRepositoryH2DBImpl implements UserRepository {
                 "( id INT not NULL, " +
                 "login VARCHAR(255)," +
                 "password VARCHAR(255)," +
+                "first_name VARCHAR(255)," +
+                "last_name VARCHAR(255)," +
                 "PRIMARY KEY ( id )) ;";
         try (Connection connection = getConnection().orElseThrow(SQLException::new)) {
             connection.setAutoCommit(false);

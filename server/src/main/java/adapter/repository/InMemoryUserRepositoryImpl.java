@@ -8,12 +8,17 @@ import java.util.function.Predicate;
 
 public class InMemoryUserRepositoryImpl implements UserRepository {
     // key - id
-    private Map<Integer, User> userRepository = new HashMap<>();
+    private Map<Long, User> userRepository = new HashMap<>();
 
     @Override
     public Optional<User> create(User user) {
         userRepository.put(user.getId(),user);
         return Optional.ofNullable(user);
+    }
+
+    @Override
+    public Optional<User> findUser(String login, String password) {
+        return Optional.empty();
     }
 
 //    @Override
@@ -40,5 +45,10 @@ public class InMemoryUserRepositoryImpl implements UserRepository {
     @Override
     public List<User> getAllUsers() {
         return new ArrayList<>(userRepository.values());
+    }
+
+    @Override
+    public boolean removeUser(String login, String password) {
+        return false;
     }
 }
