@@ -2,7 +2,6 @@ import adapter.repository.UserRepositoryH2DBImpl;
 import domain.BankServer;
 import domain.User;
 import domain.UserRepository;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -17,11 +16,11 @@ public class BankServerTest {
     private static BankServer bankServer;
 
     @BeforeAll
-    public static void init(){
+    public static void init() {
         userRepository = new UserRepositoryH2DBImpl();
         bankServer = new BankServer(userRepository);
-//        bankServer.setUserRepository(new UserRepositoryH2DBImpl());
     }
+
     @Test
     void authorizeUser() {
         User user = User.builder()
@@ -40,12 +39,13 @@ public class BankServerTest {
         boolean removed = removeUser.remove(user);
 
         Assertions.assertAll(
-                ()->Assertions.assertTrue(isAuth),
-                ()->Assertions.assertTrue(removed)
+                () -> Assertions.assertTrue(isAuth),
+                () -> Assertions.assertTrue(removed)
         );
     }
+
     @Test
-    void createUser(){
+    void createUser() {
         User user = User.builder()
                 .cardNumber("22222222")
                 .pinCode("1111")
@@ -55,12 +55,13 @@ public class BankServerTest {
 
         CreateUser createUser = new CreateUser(userRepository);
 
-        Optional<User> optUser =  createUser.create(user);
+        Optional<User> optUser = createUser.create(user);
 
         Assertions.assertTrue(optUser.isPresent());
     }
+
     @Test
-    void createUserDuplicate(){
+    void createUserDuplicate() {
         User user1 = User.builder()
                 .cardNumber("111")
                 .pinCode("222")
@@ -77,23 +78,24 @@ public class BankServerTest {
 
         CreateUser createUser = new CreateUser(userRepository);
 
-        Optional<User> optUser1 =  createUser.create(user1);
-        Optional<User> optUser2 =  createUser.create(user2);
+        Optional<User> optUser1 = createUser.create(user1);
+        Optional<User> optUser2 = createUser.create(user2);
 
         RemoveUser removeUser = new RemoveUser(userRepository);
         boolean remove1 = removeUser.remove(user1);
         boolean remove2 = removeUser.remove(user2);
 
         Assertions.assertAll(
-                ()->Assertions.assertTrue(optUser1.isPresent()),
-                ()->Assertions.assertFalse(optUser2.isPresent()),
-                ()->Assertions.assertTrue(remove1),
-                ()->Assertions.assertFalse(remove2)
+                () -> Assertions.assertTrue(optUser1.isPresent()),
+                () -> Assertions.assertFalse(optUser2.isPresent()),
+                () -> Assertions.assertTrue(remove1),
+                () -> Assertions.assertFalse(remove2)
         );
 
     }
+
     @Test
-    void getAllUsersTest(){
+    void getAllUsersTest() {
         User user1 = User.builder()
                 .cardNumber("222")
                 .pinCode("333")
@@ -110,9 +112,8 @@ public class BankServerTest {
 
         CreateUser createUser = new CreateUser(userRepository);
 
-        Optional<User> optUser1 =  createUser.create(user1);
-        Optional<User> optUser2 =  createUser.create(user2);
-
+        Optional<User> optUser1 = createUser.create(user1);
+        Optional<User> optUser2 = createUser.create(user2);
 
 
         List<User> users = userRepository.getAllUsers();
@@ -123,9 +124,9 @@ public class BankServerTest {
         boolean remove2 = removeUser.remove(user2);
 
         Assertions.assertAll(
-                ()->Assertions.assertTrue(users.size() > 0),
-                ()->Assertions.assertTrue(remove1),
-                ()->Assertions.assertTrue(remove2)
+                () -> Assertions.assertTrue(users.size() > 0),
+                () -> Assertions.assertTrue(remove1),
+                () -> Assertions.assertTrue(remove2)
         );
 
     }

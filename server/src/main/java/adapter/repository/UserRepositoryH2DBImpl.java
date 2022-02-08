@@ -16,7 +16,7 @@ public class UserRepositoryH2DBImpl implements UserRepository {
     private final String USER = "sa";
     private final String PASS = "";
 
-    private int nextAvailableId;
+    private long nextAvailableId;
 
     public UserRepositoryH2DBImpl() {
         dropTableIfExist("USERS");
@@ -37,7 +37,7 @@ public class UserRepositoryH2DBImpl implements UserRepository {
         try (Connection connection = getConnection().orElseThrow(SQLException::new)) {
             connection.setAutoCommit(false);
             try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-                preparedStatement.setInt(1, nextAvailableId);
+                preparedStatement.setLong(1, nextAvailableId);
                 preparedStatement.setString(2, user.getCardNumber());
                 preparedStatement.setString(3, user.getPinCode());
                 preparedStatement.setString(4, user.getFirstName());
@@ -71,7 +71,7 @@ public class UserRepositoryH2DBImpl implements UserRepository {
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
                     while (resultSet.next()) {
                         user = User.builder()
-                                .id(resultSet.getInt("id"))
+                                .id(resultSet.getLong("id"))
                                 .cardNumber(resultSet.getString("login"))
                                 .pinCode(resultSet.getString("password"))
                                 .firstName(resultSet.getString("first_name"))
@@ -101,7 +101,7 @@ public class UserRepositoryH2DBImpl implements UserRepository {
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
                     while (resultSet.next()) {
                         User user = User.builder()
-                                .id(resultSet.getInt("id"))
+                                .id(resultSet.getLong("id"))
                                 .cardNumber(resultSet.getString("login"))
                                 .pinCode(resultSet.getString("password"))
                                 .firstName(resultSet.getString("first_name"))
@@ -133,8 +133,7 @@ public class UserRepositoryH2DBImpl implements UserRepository {
             try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
                 rows = preparedStatement.executeUpdate();
                 connection.commit();
-            }
-            catch (SQLException e) {
+            } catch (SQLException e) {
                 connection.rollback();
                 e.printStackTrace();
             }
@@ -172,7 +171,7 @@ public class UserRepositoryH2DBImpl implements UserRepository {
     private boolean createTableUsers() {
         String sql = "CREATE TABLE IF NOT EXISTS " +
                 "USERS" +
-                "( id INT not NULL, " +
+                "( id BIGINT not NULL, " +
                 "login VARCHAR(255)," +
                 "password VARCHAR(255)," +
                 "first_name VARCHAR(255)," +
@@ -211,14 +210,14 @@ public class UserRepositoryH2DBImpl implements UserRepository {
         return false;
     }
 
-    private int getNextId() {
+    private long getNextId() {
         String sql = "SELECT id FROM USERS ORDER BY id DESC LIMIT 1;";
-        int lastActualId = 0;
+        long lastActualId = 0;
         try (Connection connection = getConnection().orElseThrow(SQLException::new)) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
                     if (resultSet.first()) {
-                        lastActualId = resultSet.getInt("id");
+                        lastActualId = resultSet.getLong("id");
                     }
                 }
             }

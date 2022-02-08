@@ -9,4 +9,5 @@ public interface ScoreRepository {
     Optional<Score> findScoreByCardNumber(String cardNumber);
 
 
+    boolean isScoreExist(String cardNumber);
 }
