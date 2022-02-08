@@ -6,8 +6,11 @@ import java.util.Set;
 
 @Data
 public class User {
-    private String id;
+    private int id;
     private String firstName;
     private String lastName;
     private Set<Score> scores;
+
+    private String login;
+    private String password;
 }

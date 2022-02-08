@@ -8,32 +8,37 @@ import java.util.function.Predicate;
 
 public class InMemoryUserRepositoryImpl implements UserRepository {
     // key - id
-    private Map<String, User> userRepository = new HashMap<>();
+    private Map<Integer, User> userRepository = new HashMap<>();
 
     @Override
-    public User create(User user) {
+    public Optional<User> create(User user) {
         userRepository.put(user.getId(),user);
-        return user;
+        return Optional.ofNullable(user);
     }
 
+//    @Override
+//    public Optional<User> findUserByCardNumber(String cardNumber) {
+//        Predicate<User> pr = (user)->user.getScores().stream().anyMatch(score -> score.getCardNumber().equals(cardNumber));
+//        return userRepository
+//                .values()
+//                .stream()
+//                .filter(pr)
+//                .findAny();
+//    }
+//
+//    @Override
+//    public Optional<User> findUserById(String id) {
+//        return Optional.ofNullable(userRepository.get(id));
+//    }
+
     @Override
-    public Optional<User> findUserByCardNumber(String cardNumber) {
-        Predicate<User> pr = (user)->user.getScores().stream().anyMatch(score -> score.getCardNumber().equals(cardNumber));
-        return userRepository
-                .values()
-                .stream()
-                .filter(pr)
-                .findAny();
+    public boolean isUserExist(String login, String password) {
+        return false;
     }
 
-    @Override
-    public Optional<User> findUserById(String id) {
-        return Optional.ofNullable(userRepository.get(id));
-    }
-
 
     @Override
-    public List<User> findAllUsers() {
+    public List<User> getAllUsers() {
         return new ArrayList<>(userRepository.values());
     }
 }

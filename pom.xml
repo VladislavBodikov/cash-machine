@@ -23,6 +23,7 @@
         <lombok.version>1.18.20</lombok.version>
         <junit-jupiter-api.version>5.8.2</junit-jupiter-api.version>
         <mockito-core.version>3.11.2</mockito-core.version>
+        <h2.version>1.4.199</h2.version>
 
     </properties>
     <dependencies>
@@ -43,6 +44,12 @@
             <artifactId>mockito-core</artifactId>
             <version>${mockito-core.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>${h2.version}</version>
+            <scope>runtime</scope>
         </dependency>
     </dependencies>
 
