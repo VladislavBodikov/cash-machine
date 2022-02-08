@@ -12,6 +12,8 @@ public interface UserRepository {
 
     Optional<User> findUserByCardNumber(String cardNumber);
 
+    Optional<User> findUserById(String id);
+
     List<User> findAllUsers();
 
 }

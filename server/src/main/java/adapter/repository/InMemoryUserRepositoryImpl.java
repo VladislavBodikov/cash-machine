@@ -6,7 +6,7 @@ import domain.UserRepository;
 import java.util.*;
 import java.util.function.Predicate;
 
-public class InMemoryUserRepository implements UserRepository {
+public class InMemoryUserRepositoryImpl implements UserRepository {
     // key - id
     private Map<String, User> userRepository = new HashMap<>();
 
@@ -24,6 +24,11 @@ public class InMemoryUserRepository implements UserRepository {
                 .stream()
                 .filter(pr)
                 .findAny();
+    }
+
+    @Override
+    public Optional<User> findUserById(String id) {
+        return Optional.ofNullable(userRepository.get(id));
     }
 
 
