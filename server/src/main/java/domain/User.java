@@ -1,15 +1,19 @@
 package domain;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.Set;
 
 @Data
+@Builder
 public class User {
-    private String id;
+    private long id;
     private String firstName;
     private String lastName;
-    // отчество
-    private String patronymic;
     private Set<Score> scores;
+    // login
+    private String cardNumber;
+    // password
+    private String pinCode;
 }

@@ -5,3 +5,8 @@ client-server spring boot application
 Minimal Viable Product
 
 Клиент должен получать баланс на карте из банкомата
+
+#Client (банкомат):
+login - номер карты
+
+password - PIN-code

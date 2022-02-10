@@ -5,15 +5,13 @@ import domain.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.Optional;
-
 @Data
 @AllArgsConstructor
-public class CreateUser {
+public class RemoveUser {
 
     private UserRepository userRepository;
 
-    public Optional<User> create(User user){
-        return userRepository.create(user);
+    public boolean remove(User user){
+        return userRepository.removeUser(user.getCardNumber(), user.getPinCode());
     }
 }

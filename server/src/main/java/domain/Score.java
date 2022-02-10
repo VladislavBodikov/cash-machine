@@ -6,8 +6,9 @@ import java.math.BigDecimal;
 
 @Data
 public class Score {
-    private String id;
+    private long id;
+    private long userId;
     private String cardNumber;
-    private String numberPaymentAccount;
+    private String scoreNumber;
     private BigDecimal amount;
 }
