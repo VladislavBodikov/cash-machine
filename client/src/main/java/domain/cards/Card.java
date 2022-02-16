@@ -1,14 +1,15 @@
-package domain.entity.cards;
+package domain.cards;
 
-import domain.entity.Score;
+import domain.Score;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
 public class Card {
-    private final String cardHolderName;
-    private final String number;
+    private final String firstName;
+    private final String lastName;
+    private final String cardNumber;
     private final String cvv;
     private final String endMonth;
     private final String endYear;

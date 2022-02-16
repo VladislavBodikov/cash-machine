@@ -1,6 +1,5 @@
-package domain.entity;
+package domain;
 
-import lombok.Builder;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -8,14 +7,14 @@ import java.math.BigDecimal;
 
 @Data
 public class Score implements Serializable {
-    // расчетный счет
-    private String numberPaymentAccount;
-    // номер пластиковой карты соответствующей счету
+
+    private long id;
+    private long userId;
     private String cardNumber;
-    // баланс счета
+    private String scoreNumber;
     private BigDecimal amount;
 
-    public int compareToByAmount(double amountToCompare){
+    public int compareToByAmount(double amountToCompare) {
         BigDecimal toCompare = new BigDecimal(amountToCompare);
         return amount.compareTo(toCompare);
     }

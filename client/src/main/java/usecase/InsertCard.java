@@ -1,8 +1,8 @@
 package usecase;
 
-import domain.entity.CashMachine;
-import domain.entity.cards.Card;
-import domain.entity.cards.CardType;
+import domain.CashMachine;
+import domain.cards.Card;
+import domain.cards.CardType;
 import usecase.exeptions.AlreadyHasCardInCardReader;
 
 public final class InsertCard {
@@ -14,12 +14,6 @@ public final class InsertCard {
     }
 
     public Card insert(Card card) throws AlreadyHasCardInCardReader {
-        if (cashMachine.getCard().getCardType() == CardType.EMPTY) {
-
-            cashMachine.setCard(card);
-            return card;
-        } else {
-            throw new AlreadyHasCardInCardReader("В картоприемнике уже есть карта");
-        }
+        return cashMachine.insertCard(card);
     }
 }

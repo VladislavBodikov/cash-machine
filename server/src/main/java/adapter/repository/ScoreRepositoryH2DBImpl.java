@@ -19,7 +19,7 @@ public class ScoreRepositoryH2DBImpl implements ScoreRepository {
     private long nextAvailableId;
 
     public ScoreRepositoryH2DBImpl() {
-        dropTableIfExist("SCORES");
+//        dropTableIfExist("SCORES");
         createTableScores();
         nextAvailableId = getNextId();
     }
@@ -73,6 +73,7 @@ public class ScoreRepositoryH2DBImpl implements ScoreRepository {
                         score.setId(resultSet.getLong("id"));
                         score.setCardNumber(resultSet.getString("card_number"));
                         score.setScoreNumber(resultSet.getString("score_number"));
+                        score.setAmount(resultSet.getBigDecimal("amount"));
                     }
                 }
             }

@@ -1,5 +1,6 @@
 import adapter.repository.ScoreRepositoryH2DBImpl;
 import adapter.repository.UserRepositoryH2DBImpl;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import domain.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -8,6 +9,8 @@ import usecase.CreateScore;
 import usecase.CreateUser;
 import usecase.RemoveUser;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -185,5 +188,12 @@ public class BankServerTest {
                 ()->Assertions.assertTrue(createUser1Score2),
                 ()->Assertions.assertTrue(createUser2Score1));
 
+    }
+    @Test
+    void readInputUserJackson() throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        User inputUser = objectMapper.readValue(new File("C:\\SberJava\\cash-machine\\server\\inputUser.json"),User.class);
+        System.out.println(inputUser.getCardNumber());
+        System.out.println(inputUser.getPinCode());
     }
 }

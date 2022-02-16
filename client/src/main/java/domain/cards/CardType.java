@@ -1,4 +1,4 @@
-package domain.entity.cards;
+package domain.cards;
 
 public enum CardType {
     CREDIT,
