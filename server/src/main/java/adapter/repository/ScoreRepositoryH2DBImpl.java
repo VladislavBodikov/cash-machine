@@ -2,8 +2,11 @@ package adapter.repository;
 
 import domain.Score;
 import domain.ScoreRepository;
+import domain.User;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class ScoreRepositoryH2DBImpl implements ScoreRepository {
@@ -16,13 +19,13 @@ public class ScoreRepositoryH2DBImpl implements ScoreRepository {
     private long nextAvailableId;
 
     public ScoreRepositoryH2DBImpl() {
-        dropTableIfExist("SCORES");
+//        dropTableIfExist("SCORES");
         createTableScores();
         nextAvailableId = getNextId();
     }
 
     @Override
-    public Optional<Score> createScore(Score score) {
+    public Optional<Score> create(Score score) {
         Optional<Score> toReturn = Optional.empty();
         if (isScoreExist(score.getCardNumber())) {
             return toReturn;
@@ -60,7 +63,7 @@ public class ScoreRepositoryH2DBImpl implements ScoreRepository {
     @Override
     public Optional<Score> findScoreByCardNumber(String cardNumber) {
         Score score = null;
-        String sql = "SELECT id,card_number,score_number, amount" +
+        String sql = "SELECT id,card_number,score_number, amount " +
                 "FROM SCORES WHERE card_number = '" + cardNumber + "'  LIMIT 1";
         try (Connection connection = getConnection().orElseThrow(SQLException::new)) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -70,6 +73,7 @@ public class ScoreRepositoryH2DBImpl implements ScoreRepository {
                         score.setId(resultSet.getLong("id"));
                         score.setCardNumber(resultSet.getString("card_number"));
                         score.setScoreNumber(resultSet.getString("score_number"));
+                        score.setAmount(resultSet.getBigDecimal("amount"));
                     }
                 }
             }
@@ -77,6 +81,33 @@ public class ScoreRepositoryH2DBImpl implements ScoreRepository {
             exception.printStackTrace();
         }
         return Optional.ofNullable(score);
+    }
+
+    @Override
+    public List<Score> getAllScores() {
+        List<Score> scores = new ArrayList<>();
+        String sql = "SELECT id,user_id, card_number,score_number,amount FROM SCORES;";
+
+        try (Connection connection = getConnection().orElseThrow(SQLException::new)) {
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    while (resultSet.next()) {
+                        Score score = new Score();
+                        score.setId(resultSet.getLong("id"));
+                        score.setUserId(resultSet.getLong("user_id"));
+                        score.setCardNumber(resultSet.getString("card_number"));
+                        score.setScoreNumber(resultSet.getString("score_number"));
+                        score.setAmount(resultSet.getBigDecimal("amount"));
+
+                        scores.add(score);
+                    }
+                }
+            }
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+        }
+
+        return scores;
     }
 
     @Override

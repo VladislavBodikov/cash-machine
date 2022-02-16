@@ -1,15 +1,15 @@
 package usecase;
 
-import domain.entity.CashMachine;
-import domain.entity.cards.Card;
-import domain.entity.cards.CardType;
+import domain.CashMachine;
+import domain.cards.Card;
+import domain.cards.CardType;
 import lombok.Getter;
 import lombok.Setter;
 import usecase.exeptions.NoAvailableCardsToExtract;
 
 public final class ExtractCard {
 
-    private final Card emptyCard = Card.builder().cardType(CardType.EMPTY).build();
+
 
     @Setter
     @Getter
@@ -20,17 +20,7 @@ public final class ExtractCard {
     }
 
     public Card extract() throws NoAvailableCardsToExtract {
-
-        Card card = cashMachine.getCard();
-
-        if (card.getCardType() == CardType.EMPTY) {
-
-            throw new NoAvailableCardsToExtract("Картоприемник пуст!");
-        } else {
-
-            cashMachine.setCard(emptyCard);
-            return card;
-        }
+        return cashMachine.extractCard();
     }
 
 }

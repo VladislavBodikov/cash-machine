@@ -19,7 +19,7 @@ public class UserRepositoryH2DBImpl implements UserRepository {
     private long nextAvailableId;
 
     public UserRepositoryH2DBImpl() {
-        dropTableIfExist("USERS");
+//        dropTableIfExist("USERS");
         createTableUsers();
         nextAvailableId = getNextId();
 

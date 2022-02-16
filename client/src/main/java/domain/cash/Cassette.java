@@ -1,4 +1,4 @@
-package domain.entity.cash;
+package domain.cash;
 
 import lombok.Data;
 
