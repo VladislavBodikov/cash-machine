@@ -44,7 +44,7 @@ public class TestConnectonServlet extends HttpServlet {
         User inputUser = getInputUserFromJson(userInputData);
         // Step 1. find score in DB
         Optional<Score> foundedScore = findScore.findScoreByCardNumber(inputUser.getScore().getCardNumber());
-        if (foundedScore.isPresent()){
+        if (foundedScore.isPresent() && isPinCodeRight(foundedScore,inputUser)){
             // Step 2. find user by score.userId
             Optional<User> foundedUser = findUser.findById(foundedScore.get().getUserId());
             if (foundedUser.isPresent()){
@@ -54,10 +54,16 @@ public class TestConnectonServlet extends HttpServlet {
                 // send response User with full data from DB
                 resp.getWriter().write(responseJson);
             }
+            else {
+                resp.getWriter().write("User not found");
+            }
         }
         else {
             resp.getWriter().write("Wrong PIN-code");
         }
+    }
+    private boolean isPinCodeRight(Optional<Score> foundedScore, User inputUser){
+        return foundedScore.get().getPinCode().equals(inputUser.getScore().getPinCode());
     }
 
     private String readRequestBody(HttpServletRequest req) throws IOException {

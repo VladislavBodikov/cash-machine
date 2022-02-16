@@ -11,5 +11,7 @@ public interface ScoreRepository {
 
     List<Score> getAllScores();
 
+    boolean removeScore(String cardNumber);
+
     boolean isScoreExist(String cardNumber);
 }

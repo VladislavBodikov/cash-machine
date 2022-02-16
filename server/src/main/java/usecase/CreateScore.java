@@ -16,19 +16,17 @@ public class CreateScore {
     private ScoreRepository scoreRepository;
     private UserRepository userRepository;
 
-    public boolean create(Score newScore, User toUser) {
+    public Optional<Score> create(Score newScore, User toUser) {
         FindUser findUser = new FindUser(userRepository);
 
         Optional<User> userFromDB = findUser.findByName(toUser.getFirstName(),toUser.getLastName());
 
         if (userFromDB.isPresent()){
-
             newScore.setUserId(userFromDB.get().getId());
-
-            Optional<Score> optScore = scoreRepository.create(newScore);
-            return optScore.isPresent();
+            return scoreRepository.create(newScore);
         }
-        return false;
+
+        return Optional.empty();
     }
 
 }

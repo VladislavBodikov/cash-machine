@@ -2,7 +2,6 @@ package adapter.repository;
 
 import domain.Score;
 import domain.ScoreRepository;
-import domain.User;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -60,6 +59,30 @@ public class ScoreRepositoryH2DBImpl implements ScoreRepository {
             exception.printStackTrace();
         }
         return toReturn;
+    }
+
+    @Override
+    public boolean removeScore(String cardNumber) {
+        if (!isScoreExist(cardNumber)) {
+            return false;
+        }
+
+        int rows = 0;
+        String sql = "DELETE FROM SCORES WHERE card_number = '" + cardNumber + "'";
+
+        try (Connection connection = getConnection().orElseThrow(SQLException::new)) {
+            connection.setAutoCommit(false);
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+                rows = preparedStatement.executeUpdate();
+                connection.commit();
+            } catch (SQLException e) {
+                connection.rollback();
+                e.printStackTrace();
+            }
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+        return rows > 0;
     }
 
     @Override
