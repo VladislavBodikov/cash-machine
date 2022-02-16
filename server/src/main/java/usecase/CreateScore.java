@@ -6,7 +6,6 @@ import domain.User;
 import domain.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 
 import java.util.Optional;
 
@@ -20,7 +19,7 @@ public class CreateScore {
     public boolean create(Score newScore, User toUser) {
         FindUser findUser = new FindUser(userRepository);
 
-        Optional<User> userFromDB = findUser.findByLoginAndPassword(toUser.getCardNumber(),toUser.getPinCode());
+        Optional<User> userFromDB = findUser.findByName(toUser.getFirstName(),toUser.getLastName());
 
         if (userFromDB.isPresent()){
 

@@ -15,9 +15,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Optional;
 
 @WebServlet("/test")
@@ -41,31 +39,35 @@ public class TestConnectonServlet extends HttpServlet {
         resp.setCharacterEncoding("UTF-8");
         resp.setContentType("application/json; charset=utf-8");
         // read REQUEST
-        StringBuilder userInputData = readRequestBody(req);
+        String userInputData = readRequestBody(req);
 
-        User inputUser = getInputUserFromJson(userInputData.toString());
-        // find user and score in DB
-        Optional<User> foundedUser = findUser.findByLoginAndPassword(inputUser.getCardNumber(),inputUser.getPinCode());
-        Optional<Score> foundedScore = findScore.findScoreByCardNumber(inputUser.getCardNumber());
-
-        if (foundedUser.isPresent() && foundedScore.isPresent()){
-            User userFromDB = foundedUser.get();
-            userFromDB.setScore(foundedScore.get());
-            String responseJson = userToJson(userFromDB);
-            // send response User with full data from DB
-            resp.getWriter().write(responseJson);
+        User inputUser = getInputUserFromJson(userInputData);
+        // Step 1. find score in DB
+        Optional<Score> foundedScore = findScore.findScoreByCardNumber(inputUser.getScore().getCardNumber());
+        if (foundedScore.isPresent()){
+            // Step 2. find user by score.userId
+            Optional<User> foundedUser = findUser.findById(foundedScore.get().getUserId());
+            if (foundedUser.isPresent()){
+                User userFromDB = foundedUser.get();
+                userFromDB.setScore(foundedScore.get());
+                String responseJson = userToJson(userFromDB);
+                // send response User with full data from DB
+                resp.getWriter().write(responseJson);
+            }
         }
-        resp.getWriter().write("User not found");
+        else {
+            resp.getWriter().write("Wrong PIN-code");
+        }
     }
 
-    private StringBuilder readRequestBody(HttpServletRequest req) throws IOException {
+    private String readRequestBody(HttpServletRequest req) throws IOException {
         StringBuilder userInputData = new StringBuilder();
         BufferedReader br = req.getReader();
         String str;
         while( (str = br.readLine()) != null ){
             userInputData.append(str);
         }
-        return userInputData;
+        return userInputData.toString();
     }
 
     private User getInputUserFromJson(String inputString) throws IOException {

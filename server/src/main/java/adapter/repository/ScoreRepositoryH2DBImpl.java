@@ -19,7 +19,7 @@ public class ScoreRepositoryH2DBImpl implements ScoreRepository {
     private long nextAvailableId;
 
     public ScoreRepositoryH2DBImpl() {
-//        dropTableIfExist("SCORES");
+        dropTableIfExist("SCORES");
         createTableScores();
         nextAvailableId = getNextId();
     }
@@ -27,11 +27,12 @@ public class ScoreRepositoryH2DBImpl implements ScoreRepository {
     @Override
     public Optional<Score> create(Score score) {
         Optional<Score> toReturn = Optional.empty();
+
         if (isScoreExist(score.getCardNumber())) {
             return toReturn;
         }
 
-        String sql = "INSERT INTO SCORES VALUES(?,?,?,?,?);";
+        String sql = "INSERT INTO SCORES VALUES(?,?,?,?,?,?);";
         int rows = 0;
         try (Connection connection = getConnection().orElseThrow(SQLException::new)) {
             connection.setAutoCommit(false);
@@ -41,6 +42,7 @@ public class ScoreRepositoryH2DBImpl implements ScoreRepository {
                 preparedStatement.setString(3, score.getCardNumber());
                 preparedStatement.setString(4, score.getScoreNumber());
                 preparedStatement.setString(5, score.getAmount().toString());
+                preparedStatement.setString(6, score.getPinCode());
 
                 rows = preparedStatement.executeUpdate();
 
@@ -63,17 +65,20 @@ public class ScoreRepositoryH2DBImpl implements ScoreRepository {
     @Override
     public Optional<Score> findScoreByCardNumber(String cardNumber) {
         Score score = null;
-        String sql = "SELECT id,card_number,score_number, amount " +
-                "FROM SCORES WHERE card_number = '" + cardNumber + "'  LIMIT 1";
+        String sql = "SELECT id, user_id, card_number, score_number, amount, pin_code " +
+                "FROM SCORES WHERE " +
+                "card_number = '" + cardNumber + "' LIMIT 1";
         try (Connection connection = getConnection().orElseThrow(SQLException::new)) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
                     while (resultSet.next()) {
                         score = new Score();
                         score.setId(resultSet.getLong("id"));
+                        score.setUserId(resultSet.getLong("user_id"));
                         score.setCardNumber(resultSet.getString("card_number"));
                         score.setScoreNumber(resultSet.getString("score_number"));
                         score.setAmount(resultSet.getBigDecimal("amount"));
+                        score.setPinCode(resultSet.getString("pin_code"));
                     }
                 }
             }
@@ -86,7 +91,7 @@ public class ScoreRepositoryH2DBImpl implements ScoreRepository {
     @Override
     public List<Score> getAllScores() {
         List<Score> scores = new ArrayList<>();
-        String sql = "SELECT id,user_id, card_number,score_number,amount FROM SCORES;";
+        String sql = "SELECT id,user_id, card_number,score_number,amount, pin_code FROM SCORES;";
 
         try (Connection connection = getConnection().orElseThrow(SQLException::new)) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -98,6 +103,7 @@ public class ScoreRepositoryH2DBImpl implements ScoreRepository {
                         score.setCardNumber(resultSet.getString("card_number"));
                         score.setScoreNumber(resultSet.getString("score_number"));
                         score.setAmount(resultSet.getBigDecimal("amount"));
+                        score.setPinCode(resultSet.getString("pin_code"));
 
                         scores.add(score);
                     }
@@ -148,6 +154,7 @@ public class ScoreRepositoryH2DBImpl implements ScoreRepository {
                 "card_number VARCHAR(255)," +
                 "score_number VARCHAR(255) not NULL," +
                 "amount DOUBLE PRECISION not NULL, " +
+                "pin_code VARCHAR(255), " +
                 "PRIMARY KEY ( id )) ;";
         try (Connection connection = getConnection().orElseThrow(SQLException::new)) {
             connection.setAutoCommit(false);

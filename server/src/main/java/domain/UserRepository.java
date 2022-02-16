@@ -11,11 +11,13 @@ public interface UserRepository {
 
 //    Optional<User> findUserById(String id);
 
-    Optional<User> findUser(String login, String password);
+    Optional<User> findUserById(long id);
 
-    boolean isUserExist(String login, String password);
+    boolean isUserExist(String firstName,String lastName);
 
     List<User> getAllUsers();
+
+    Optional<User> findUserByName(String firstName, String lastName);
 
     boolean removeUser(String login, String password);
 

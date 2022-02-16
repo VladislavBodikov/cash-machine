@@ -14,8 +14,11 @@ public class FindUser {
 
     private UserRepository userRepository;
 
-    public Optional<User> findByLoginAndPassword(String login, String password) {
-        return userRepository.findUser(login, password);
+    public Optional<User> findById(long id) {
+        return userRepository.findUserById(id);
+    }
+    public Optional<User> findByName(String firstName, String lastName){
+        return userRepository.findUserByName(firstName,lastName);
     }
 
     public List<User> findAll() {

@@ -14,7 +14,7 @@ public class User {
 //    private Set<Score> scores;
     private Score score;
     // login
-    private String cardNumber;
+   // private String cardNumber;
     // password
-    private String pinCode;
+//    private String pinCode;
 }
