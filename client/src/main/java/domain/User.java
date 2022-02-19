@@ -16,8 +16,8 @@ public class User implements Serializable {
     private String lastName;
     //    private Set<Score> scores;
     private Score score;
-    // login
-    private String cardNumber;
-    // password
-    private String pinCode;
+//    // login
+//    private String cardNumber;
+//    // password
+//    private String pinCode;
 }

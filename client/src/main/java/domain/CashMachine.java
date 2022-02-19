@@ -23,6 +23,7 @@ public class CashMachine {
 
     private Card card;
     private User user;
+    private Score score;
     private String serverURL;
 
     public CashMachine(String id) {
@@ -33,21 +34,12 @@ public class CashMachine {
     public Card insertCard(Card card) throws AlreadyHasCardInCardReader {
         if (this.card.getCardType() == CardType.EMPTY) {
             this.card = card;
-            readUserDataFromCard();
+            readScoreFromCard();
+            readUserFromCard();
             //authUser();
             return this.card;
         } else {
             throw new AlreadyHasCardInCardReader("В картоприемнике уже есть карта");
-        }
-    }
-
-    private void readUserDataFromCard() {
-        if (card.getCardType() != CardType.EMPTY) {
-            this.user = User.builder()
-                    .firstName(card.getFirstName())
-                    .lastName(card.getLastName())
-                    .cardNumber(card.getCardNumber())
-                    .build();
         }
     }
 
@@ -66,7 +58,7 @@ public class CashMachine {
 
     public boolean authUser() throws IOException {
         // init connection
-        URL url = new URL(serverURL + "/cash-machine/test");
+        URL url = new URL(serverURL + "/cash-machine/auth");
         HttpURLConnection http = (HttpURLConnection)url.openConnection();
         http.setRequestMethod("POST");
         http.setDoOutput(true);
@@ -100,6 +92,19 @@ public class CashMachine {
             e.printStackTrace();
             return false;
         }
+    }
+
+    private void readScoreFromCard() {
+        this.score = new Score();
+        score.setCardNumber(card.getCardNumber());
+    }
+
+    private void readUserFromCard() {
+        this.user = User.builder()
+                .firstName(card.getFirstName())
+                .lastName(card.getLastName())
+                .score(score)
+                .build();
     }
 
 

@@ -22,30 +22,24 @@ import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 public class CashMachineTest {
-
+    private static final String SERVER_URL = "http://localhost:8080";
     private static CashMachine cashMachine = null;
     private static InsertCard insertCard = null;
     private static ExtractCard extractCard = null;
     private static AuthUser authUser = null;
-    private static Score score = null;
     private static Card card = null;
-    private static User user = null;
 
     @Test
     @BeforeEach
     void initOptions() {
         cashMachine = new CashMachine("1");
+        cashMachine.setServerURL(SERVER_URL);
 
         insertCard = new InsertCard(cashMachine);
 
         extractCard = new ExtractCard(cashMachine);
 
         authUser = new AuthUser(cashMachine);
-
-//        score = new Score();
-//        score.setCardNumber("3333" + "3333" + "3333" + "3333");
-//        score.setScoreNumber("40000000056786");
-//        score.setAmount(new BigDecimal(2_500_000));
 
         card = Card.builder()
                 .firstName("VLADISLAV")
@@ -64,10 +58,17 @@ public class CashMachineTest {
     void insertOneCardInCardReader() {
         try {
             insertCard.insert(card);
-        } catch (AlreadyHasCardInCardReader e) {
+            boolean isReadUserData  ="VLADISLAV".equals(cashMachine.getUser().getFirstName());
+            boolean isReadScoreData = "2202000000000011".equals(cashMachine.getScore().getCardNumber());
+            extractCard.extract();
+            Assertions.assertAll(
+                    ()->Assertions.assertTrue(isReadUserData),
+                    ()->Assertions.assertTrue(isReadScoreData)
+            );
+        } catch (AlreadyHasCardInCardReader | NoAvailableCardsToExtract e) {
             e.printStackTrace();
         }
-        Assertions.assertEquals(cashMachine.getCard().getScore().getAmount(), new BigDecimal(2_500_000));
+
     }
 
     @Test
@@ -110,8 +111,7 @@ public class CashMachineTest {
     void authUserSuccess() throws AlreadyHasCardInCardReader, IOException, NoAvailableCardsToExtract {
         insertCard.insert(card);
 
-        cashMachine.setServerURL("http://localhost:8080");
-        cashMachine.getUser().setPinCode("5115");
+        cashMachine.getUser().getScore().setPinCode("5115");
 
         boolean isAuth = authUser.auth();
 
@@ -123,8 +123,7 @@ public class CashMachineTest {
     void authUserFailure() throws AlreadyHasCardInCardReader, IOException, NoAvailableCardsToExtract {
         insertCard.insert(card);
 
-        cashMachine.setServerURL("http://localhost:8080");
-        cashMachine.getUser().setPinCode("0000");
+        cashMachine.getUser().getScore().setPinCode("0000");
 
         boolean isAuth = authUser.auth();
 
@@ -133,42 +132,65 @@ public class CashMachineTest {
 
     @Test
     @DisplayName("Получить баланс пользователя VLADISLAV - карта 1")
-    void checkBalanceVladislav() throws AlreadyHasCardInCardReader {
+    void checkBalanceVladislav1() throws AlreadyHasCardInCardReader, NoAvailableCardsToExtract {
         insertCard.insert(card);
 
-        cashMachine.setServerURL("http://localhost:8080");
-        cashMachine.getUser().setPinCode("5115");
+        cashMachine.getUser().getScore().setPinCode("5115");
 
         authUser.auth();
 
         String name = cashMachine.getUser().getFirstName();
         String balance = cashMachine.getUser().getScore().getAmount().toString();
 
+        extractCard.extract();
         Assertions.assertAll(
                 ()->Assertions.assertEquals(name,"VLADISLAV"),
                 ()->Assertions.assertEquals(balance,"100.5"));
     }
+
     @Test
-    @Disabled
     @DisplayName("Получить баланс пользователя VLADISLAV - карта 2")
-    void checkBalanceAlexandra() throws AlreadyHasCardInCardReader {
+    void checkBalanceVladislav2() throws AlreadyHasCardInCardReader, NoAvailableCardsToExtract {
         Card card = Card.builder()
                 .cardType(CardType.DEBIT)
                 .cardNumber("2202000000000022")
                 .build();
         insertCard.insert(card);
 
-        cashMachine.setServerURL("http://localhost:8080");
-        cashMachine.getUser().setPinCode("5115");
+        cashMachine.getUser().getScore().setPinCode("1221");
 
         authUser.auth();
 
         String name = cashMachine.getUser().getFirstName();
         String balance = cashMachine.getUser().getScore().getAmount().toString();
 
+        extractCard.extract();
+
         Assertions.assertAll(
                 ()->Assertions.assertEquals(name,"VLADISLAV"),
-                ()->Assertions.assertEquals(balance,"100.5"));
+                ()->Assertions.assertEquals(balance,"150000.5"));
+    }
+    @Test
+    @DisplayName("Получить баланс пользователя ALEXANDRA - карта 1")
+    void checkBalanceAlexandra() throws AlreadyHasCardInCardReader, NoAvailableCardsToExtract {
+        Card card = Card.builder()
+                .cardType(CardType.DEBIT)
+                .cardNumber("2202000000000099")
+                .build();
+        insertCard.insert(card);
+
+        cashMachine.getUser().getScore().setPinCode("4554");
+
+        authUser.auth();
+
+        String name = cashMachine.getUser().getFirstName();
+        String balance = cashMachine.getUser().getScore().getAmount().toString();
+
+        extractCard.extract();
+
+        Assertions.assertAll(
+                ()->Assertions.assertEquals(name,"ALEXANDRA"),
+                ()->Assertions.assertEquals(balance,"333.5"));
     }
 
     @Test
@@ -183,10 +205,7 @@ public class CashMachineTest {
 
         //String data = "{\"cardNumber\":\"2202000000000011\",\"pinCode\":\"5115\"}";
         // send REQUEST
-        User user = User.builder()
-                .cardNumber("2202000000000011")
-                .pinCode("5115")
-                .build();
+        User user = User.builder().build();
         ObjectMapper om = new ObjectMapper();
         String data = om.writeValueAsString(user);
         byte[] out = data.getBytes(StandardCharsets.UTF_8);

@@ -1,5 +1,4 @@
-import adapter.repository.ScoreRepositoryH2DBImpl;
-import adapter.repository.UserRepositoryH2DBImpl;
+import config.ManualConfig;
 import domain.Score;
 import domain.ScoreRepository;
 import domain.User;
@@ -17,10 +16,13 @@ import java.util.Optional;
 public class ScoreRepositoryTest {
     private static UserRepository userRepository;
     private static ScoreRepository scoreRepository;
+    private static ManualConfig manualConfig;
+
     @BeforeAll
     static void init(){
-        scoreRepository = new ScoreRepositoryH2DBImpl();
-        userRepository = new UserRepositoryH2DBImpl();
+        manualConfig = ManualConfig.getInstance();
+        scoreRepository = manualConfig.getScoreRepository();
+        userRepository = manualConfig.getUserRepository();
     }
     @Test
     @DisplayName("Создаем и удаляем - user и счет")
@@ -29,8 +31,8 @@ public class ScoreRepositoryTest {
         RemoveUser removeUser = new RemoveUser(userRepository);
 
         User user = User.builder()
-                .firstName("VLADISLAV")
-                .lastName("BODIKOV")
+                .firstName("John")
+                .lastName("Baker")
                 .build();
 
         CreateScore createScore = new CreateScore(scoreRepository,userRepository);
@@ -40,7 +42,7 @@ public class ScoreRepositoryTest {
         score.setScoreNumber("4000");
         score.setAmount(new BigDecimal("100.5"));
         score.setPinCode("5115");
-        score.setCardNumber("2202000000000011");
+        score.setCardNumber("999");
 
         Optional<User> createdUser = createUser.create(user);
         Optional<Score> createdScore = createScore.create(score,user);
@@ -63,8 +65,8 @@ public class ScoreRepositoryTest {
         RemoveUser removeUser = new RemoveUser(userRepository);
 
         User user = User.builder()
-                .firstName("VLADISLAV")
-                .lastName("BODIKOV")
+                .firstName("John")
+                .lastName("Baker")
                 .build();
 
         CreateScore createScore = new CreateScore(scoreRepository,userRepository);
@@ -74,19 +76,19 @@ public class ScoreRepositoryTest {
         score1.setScoreNumber("001");
         score1.setAmount(new BigDecimal("10.5"));
         score1.setPinCode("1111");
-        score1.setCardNumber("2202000000000011");
+        score1.setCardNumber("00009999");
 
         Score score2 = new Score();
         score2.setScoreNumber("002");
         score2.setAmount(new BigDecimal("100.5"));
         score2.setPinCode("2222");
-        score2.setCardNumber("2202000000000022");
+        score2.setCardNumber("00008888");
 
         Score score3 = new Score();
         score3.setScoreNumber("003");
         score3.setAmount(new BigDecimal("1000.5"));
         score3.setPinCode("3333");
-        score3.setCardNumber("2202000000000033");
+        score3.setCardNumber("00007777");
 
         Optional<User> createdUser = createUser.create(user);
         Optional<Score> createdScore1 = createScore.create(score1,user);

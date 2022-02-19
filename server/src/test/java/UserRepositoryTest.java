@@ -1,7 +1,4 @@
-import adapter.repository.ScoreRepositoryH2DBImpl;
-import adapter.repository.UserRepositoryH2DBImpl;
-import domain.BankServer;
-import domain.ScoreRepository;
+import config.ManualConfig;
 import domain.User;
 import domain.UserRepository;
 import org.junit.jupiter.api.Assertions;
@@ -13,15 +10,17 @@ import usecase.RemoveUser;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class UserRepositoryTest {
 
     private static UserRepository userRepository;
-    private static ScoreRepository scoreRepository;
+    private static ManualConfig manualConfig;
 
     @BeforeAll
     public static void init() {
-        userRepository = new UserRepositoryH2DBImpl();
+        manualConfig = ManualConfig.getInstance();
+        userRepository = manualConfig.getUserRepository();
     }
 
     @Test
@@ -40,9 +39,9 @@ public class UserRepositoryTest {
         boolean isRemove = removeUser.remove(user);
 
         Assertions.assertAll(
-                ()->Assertions.assertTrue(optUser.isPresent()),
-                ()->Assertions.assertTrue(isRemove),
-                ()->Assertions.assertTrue(isUserExist));
+                () -> Assertions.assertTrue(optUser.isPresent()),
+                () -> Assertions.assertTrue(isRemove),
+                () -> Assertions.assertTrue(isUserExist));
     }
 
     @Test
@@ -96,15 +95,14 @@ public class UserRepositoryTest {
 
         List<User> usersFromDB = userRepository.getAllUsers();
         usersFromDB.forEach(System.out::println);
-
         RemoveUser removeUser = new RemoveUser(userRepository);
         boolean remove1 = removeUser.remove(user1);
         boolean remove2 = removeUser.remove(user2);
 
+        List<String> namesOfUsersFromDB = usersFromDB.stream().map(User::getFirstName).collect(Collectors.toList());
         Assertions.assertAll(
-                ()->Assertions.assertEquals(usersFromDB.get(0).getFirstName(),"Alex"),
-                ()->Assertions.assertEquals(usersFromDB.get(1).getFirstName(),"John"),
-                () -> Assertions.assertEquals(2, usersFromDB.size()),
+                () -> Assertions.assertTrue(namesOfUsersFromDB.contains("Alex")),
+                () -> Assertions.assertTrue(namesOfUsersFromDB.contains("John")),
                 () -> Assertions.assertTrue(remove1),
                 () -> Assertions.assertTrue(remove2)
         );

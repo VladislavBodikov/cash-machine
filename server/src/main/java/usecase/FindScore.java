@@ -2,6 +2,7 @@ package usecase;
 
 import domain.Score;
 import domain.ScoreRepository;
+import domain.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -16,5 +17,9 @@ public class FindScore {
 
     public Optional<Score> findScoreByCardNumber(String cardNumber){
         return scoreRepository.findScoreByCardNumber(cardNumber);
+    }
+
+    public List<Score> findAll() {
+        return scoreRepository.getAllScores();
     }
 }

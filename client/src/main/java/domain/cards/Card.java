@@ -13,7 +13,6 @@ public class Card {
     private final String cvv;
     private final String endMonth;
     private final String endYear;
-    private final Score score;
     private final String paymentSystem;
     private final CardType cardType;
 }
