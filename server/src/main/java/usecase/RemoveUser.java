@@ -12,6 +12,6 @@ public class RemoveUser {
     private UserRepository userRepository;
 
     public boolean remove(User user){
-        return userRepository.removeUser(user.getCardNumber(), user.getPinCode());
+        return userRepository.removeUser(user.getFirstName(), user.getLastName());
     }
 }

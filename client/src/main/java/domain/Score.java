@@ -13,6 +13,7 @@ public class Score implements Serializable {
     private String cardNumber;
     private String scoreNumber;
     private BigDecimal amount;
+    private String pinCode;
 
     public int compareToByAmount(double amountToCompare) {
         BigDecimal toCompare = new BigDecimal(amountToCompare);

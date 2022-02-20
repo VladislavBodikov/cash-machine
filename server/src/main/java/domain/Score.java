@@ -12,4 +12,5 @@ public class Score {
     private String cardNumber;
     private String scoreNumber;
     private BigDecimal amount;
+    private String pinCode;
 }

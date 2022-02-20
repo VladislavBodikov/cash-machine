@@ -17,7 +17,7 @@ public class InMemoryUserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public Optional<User> findUser(String login, String password) {
+    public Optional<User> findUserById(long id) {
         return Optional.empty();
     }
 
@@ -45,6 +45,11 @@ public class InMemoryUserRepositoryImpl implements UserRepository {
     @Override
     public List<User> getAllUsers() {
         return new ArrayList<>(userRepository.values());
+    }
+
+    @Override
+    public Optional<User> findUserByName(String firstName, String lastName) {
+        return Optional.empty();
     }
 
     @Override
