@@ -10,6 +10,7 @@ import java.util.Optional;
 
 public class ScoreRepositoryH2DBImpl implements ScoreRepository {
 
+    private final String JDBC_DRIVER = "org.h2.Driver";
     private final String DB_URL = "jdbc:h2:~/cash_machine";
 
     private final String USER = "sa";
@@ -147,10 +148,14 @@ public class ScoreRepositoryH2DBImpl implements ScoreRepository {
     // organizational methods
     private Optional<Connection> getConnection() {
         try {
+            //Class.forName (JDBC_DRIVER);
             return Optional.ofNullable(DriverManager.getConnection(DB_URL, USER, PASS));
         } catch (SQLException e) {
             e.printStackTrace();
         }
+//        catch (ClassNotFoundException e) {
+//            e.printStackTrace();
+//        }
         return Optional.empty();
     }
 

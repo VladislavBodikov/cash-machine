@@ -164,10 +164,14 @@ public class UserRepositoryH2DBImpl implements UserRepository {
     // organizational methods
     private Optional<Connection> getConnection() {
         try {
+//            Class.forName (JDBC_DRIVER);
             return Optional.ofNullable(DriverManager.getConnection(DB_URL, USER, PASS));
         } catch (SQLException e) {
             e.printStackTrace();
         }
+//        catch (ClassNotFoundException e) {
+//            e.printStackTrace();
+//        }
         return Optional.empty();
     }
 
