@@ -1,6 +1,5 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
 import domain.CashMachine;
-import domain.Score;
 import domain.User;
 import domain.cards.Card;
 import domain.cards.CardType;
@@ -12,14 +11,13 @@ import usecase.exeptions.AlreadyHasCardInCardReader;
 import usecase.exeptions.NoAvailableCardsToExtract;
 import utils.JSONUtils;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.Socket;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.Scanner;
 
 public class CashMachineTest {
     private static final String SERVER_URL = "http://localhost:8080";
@@ -114,7 +112,7 @@ public class CashMachineTest {
         cashMachine.getUser().getScore().setPinCode("5115");
 
         boolean isAuth = authUser.auth();
-
+        System.out.println(JSONUtils.toJSON(cashMachine.getUser()));
         Assertions.assertTrue(isAuth);
     }
 
